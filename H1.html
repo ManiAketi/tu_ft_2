@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <meta name="description" content="ThirdUmpire - Crowd Analytics Highlights" />
+  <meta name="theme-color" content="#0F172A" />
+  <title>ThirdUmpire - Highlights</title>
+
+  <!-- Bootstrap + Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- Swiper -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Your existing styles (DON'T change order) -->
+  <link rel="stylesheet" href="css/core.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/toast-loading.css" />
+  <link rel="stylesheet" href="css/navigation.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/video_modal.css" />
+
+  <!-- Minimal page-only safety styles (only if something missing) -->
+  <style>
+    .main-content-area { padding-top: 80px; min-height: 100vh; }
+    .section-title { font-weight: 600; }
+    .video-card, .heatmap-card { cursor: pointer; }
+    .video-overlay {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.35); opacity:0; transition:.2s;
+    }
+    .video-card:hover .video-overlay { opacity:1; }
+    .video-thumb {
+      height:210px; border-radius:12px 12px 0 0;
+      background-size:cover; background-position:center; position:relative;
+    }
+    .video-duration-badge {
+      position:absolute; bottom:10px; right:10px;
+      background:rgba(0,0,0,.7); color:#fff; font-size:12px; padding:4px 8px; border-radius:999px;
+    }
+    .play-badge {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:54px; height:54px; border-radius:50%;
+      background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:26px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ================= TOP NAV (keep same IDs for your nav js if needed) ================= -->
+<nav class="top-nav">
+  <div class="nav-content">
+    <div class="logo">
+      <i class="bi bi-camera-video-fill"></i>
+      <span>ThirdUmpire</span>
+    </div>
+
+    <div class="nav-menu">
+      <div class="nav-item" onclick="window.location.href='index.html'">
+        <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+      </div>
+      <div class="nav-item active">
+        <i class="bi bi-stars"></i><span>Highlights</span>
+      </div>
+      <div class="nav-item" onclick="window.location.href='settings.html'">
+        <i class="bi bi-gear"></i><span>Settings</span>
+      </div>
+    </div>
+
+    <div class="nav-actions d-flex align-items-center gap-3">
+      <button class="btn btn-sm btn-outline-light" onclick="showNotifications()">
+        <i class="bi bi-bell"></i>
+      </button>
+      <div class="user-menu position-relative">
+        <button class="btn btn-sm btn-outline-light" onclick="toggleUserMenu()">
+          <i class="bi bi-person-circle"></i>
+        </button>
+        <div id="userDropdown" class="dropdown-menu dropdown-menu-end shadow">
+          <button class="dropdown-item" onclick="handleLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="main-content-area container-fluid">
+
+  <!-- ================= HERO / DATE ================= -->
+  <section class="highlights-hero container py-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <h1 class="hero-title mb-1">Yesterday's Highlights</h1>
+        <p class="hero-subtitle mb-0">
+          Key insights for <strong id="highlightsDate">--</strong>
+        </p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge text-bg-success" id="deviceStatusBadge">ONLINE</span>
+        <small class="text-muted">Device: <span id="currentDeviceName">raspberrypi_001</span></small>
+      </div>
+    </div>
+
+    <!-- fallback banner -->
+    <div id="dataAvailabilityBanner" class="alert alert-warning mt-3 py-2 px-3 d-none">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <span id="dataAvailabilityText">Showing latest available data</span>
+    </div>
+  </section>
+
+  <!-- ================= STATS CARDS ================= -->
+  <section class="container pb-2">
+    <div class="row g-3">
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card-highlight">
+          <div class="stat-icon bg-primary"><i class="bi bi-people-fill"></i></div>
+          <div>
+            <div class="stat-value" id="totalVisitors">--</div>
+            <div class="stat-label">Total Visitors</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card-highlight">
+          <div class="stat-icon bg-success"><i class="bi bi-graph-up-arrow"></i></div>
+          <div>
+            <div class="stat-value" id="peakCrowd">--</div>
+            <div class="stat-label">Peak Crowd</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card-highlight">
+          <div class="stat-icon bg-warning"><i class="bi bi-bar-chart-fill"></i></div>
+          <div>
+            <div class="stat-value" id="avgCrowd">--</div>
+            <div class="stat-label">Average Crowd</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card-highlight">
+          <div class="stat-icon bg-danger"><i class="bi bi-exclamation-circle-fill"></i></div>
+          <div>
+            <div class="stat-value" id="alertsCount">--</div>
+            <div class="stat-label">Alerts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card-highlight">
+          <div class="stat-icon" style="background:#7c3aed"><i class="bi bi-clock-history"></i></div>
+          <div>
+            <div class="stat-value" id="busiestHour">--</div>
+            <div class="stat-label">Busiest Hour</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card-highlight">
+          <div class="stat-icon" style="background:#0ea5e9"><i class="bi bi-stopwatch-fill"></i></div>
+          <div>
+            <div class="stat-value" id="dwellTime">--</div>
+            <div class="stat-label">Avg Dwell</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MINI TREND + PRIMARY SWIPER ================= -->
+  <section class="container py-3">
+    <div class="row g-3 align-items-stretch">
+      <div class="col-lg-4">
+        <div class="chart-card h-100">
+          <div class="section-header">
+            <h2 class="section-title mb-0">7-Day Trend</h2>
+          </div>
+          <canvas id="highlightTrendChart" height="170"></canvas>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="chart-card h-100">
+          <div class="section-header d-flex justify-content-between align-items-center">
+            <h2 class="section-title mb-0">Top Highlights</h2>
+            <small class="text-muted">Swipe to view</small>
+          </div>
+
+          <div class="swiper" id="topHighlightsSwiper">
+            <div class="swiper-wrapper" id="topHighlightsWrapper">
+              <!-- Slides injected by JS -->
+            </div>
+
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ALL VIDEO HIGHLIGHTS ================= -->
+  <section class="container py-3">
+    <div class="section-header mb-2">
+      <h2 class="section-title">🎬 All Video Highlights</h2>
+      <p class="section-description text-muted mb-0">
+        Browse through all detected moments from <span id="highlightsDateText">yesterday</span>
+      </p>
+    </div>
+
+    <!-- Filter tabs -->
+    <ul class="nav nav-tabs mt-2 mb-3 model-tabs" id="modelTabs">
+      <li class="nav-item"><button class="nav-link active" data-model="all">All</button></li>
+      <li class="nav-item"><button class="nav-link" data-model="crowd">Crowd Peaks</button></li>
+      <li class="nav-item"><button class="nav-link" data-model="heatmap">Heatmaps</button></li>
+      <li class="nav-item"><button class="nav-link" data-model="interaction">Interactions</button></li>
+      <li class="nav-item"><button class="nav-link" data-model="visitor">Visitor Count</button></li>
+    </ul>
+
+    <div class="row g-3" id="allVideosGrid">
+      <!-- Cards injected by JS -->
+    </div>
+  </section>
+
+  <!-- ================= HEATMAP GALLERY ================= -->
+  <section class="container py-3">
+    <div class="section-header mb-2">
+      <h2 class="section-title">🔥 Top Heatmap Snapshots</h2>
+      <p class="section-description text-muted mb-0">High-activity frames detected yesterday</p>
+    </div>
+
+    <div class="row g-3" id="heatmapGallery">
+      <!-- Heatmaps injected by JS -->
+    </div>
+  </section>
+
+  <!-- ================= DEVICE STATUS STRIP ================= -->
+  <section class="container py-3 pb-5">
+    <div class="chart-card">
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <div class="status-item">
+            <span class="status-label text-muted">Device</span>
+            <div class="status-value" id="statusDeviceId">raspberrypi_001</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="status-item">
+            <span class="status-label text-muted">Last Heartbeat</span>
+            <div class="status-value" id="lastHeartbeat">--</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="status-item">
+            <span class="status-label text-muted">Last Data</span>
+            <div class="status-value" id="lastDataTime">--</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="status-item">
+            <span class="status-label text-muted">Store</span>
+            <div class="status-value" id="storeLocation">Demo Store</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+
+<!-- ================= VIDEO MODAL ================= -->
+<div class="modal fade" id="videoModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="videoModalTitle">Video Player</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <video id="highlightVideoPlayer" class="w-100" controls>
+          <source id="videoSource" src="" type="video/mp4" />
+          Your browser does not support video.
+        </video>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+/* =========================================================
+   DEMO MOCK DATA (replace mp4 urls later)
+   ========================================================= */
+const DEMO = {
+  device_id: "raspberrypi_001",
+  date: "2025-10-17", // last available
+  summary: {
+    total_visitors: 1150,
+    peak_count: 125,
+    average_count: 48,
+    alerts: 12,
+    busiest_hour: "18:00",
+    dwell_time: "4m 32s"
+  },
+  trend7: [
+    { day: "Mon", count: 820 },
+    { day: "Tue", count: 910 },
+    { day: "Wed", count: 975 },
+    { day: "Thu", count: 1010 },
+    { day: "Fri", count: 1150 },
+    { day: "Sat", count: 980 },
+    { day: "Sun", count: 860 }
+  ],
+  topHighlights: [
+    {
+      model: "crowd",
+      title: "Crowd Peak at Entrance",
+      camera: "Entrance",
+      time: "06:15 PM",
+      metric: "Peak 125",
+      duration: "00:32",
+      thumb: "/assets/demo/thumb_crowd_1.jpg",
+      video: "/assets/demo/crowd_peak_1.mp4"
+    },
+    {
+      model: "heatmap",
+      title: "Aisle-1 High Activity",
+      camera: "Aisle-1",
+      time: "02:40 PM",
+      metric: "+92%",
+      duration: "00:25",
+      thumb: "/assets/demo/thumb_heatmap_1.jpg",
+      video: "/assets/demo/heatmap_1.mp4"
+    },
+    {
+      model: "interaction",
+      title: "Employee Interaction Peak",
+      camera: "Billing",
+      time: "12:22 PM",
+      metric: "19 events",
+      duration: "00:41",
+      thumb: "/assets/demo/thumb_interaction_1.jpg",
+      video: "/assets/demo/interaction_1.mp4"
+    }
+  ],
+  videos: [
+    // these drive “All Video Highlights”
+    { model:"crowd", title:"Crowd Peak at Entrance", camera:"Entrance", count:125, time:"06:15 PM", duration:"00:32",
+      thumbnail:"/assets/demo/thumb_crowd_1.jpg", video_url:"/assets/demo/crowd_peak_1.mp4" },
+    { model:"heatmap", title:"Aisle-1 High Activity", camera:"Aisle-1", count:92, time:"02:40 PM", duration:"00:25",
+      thumbnail:"/assets/demo/thumb_heatmap_1.jpg", video_url:"/assets/demo/heatmap_1.mp4" },
+    { model:"interaction", title:"Employee Interaction Peak", camera:"Billing", count:19, time:"12:22 PM", duration:"00:41",
+      thumbnail:"/assets/demo/thumb_interaction_1.jpg", video_url:"/assets/demo/interaction_1.mp4" },
+    { model:"visitor", title:"Entry Congestion Peak", camera:"Entrance", count:234, time:"12:30 PM", duration:"00:20",
+      thumbnail:"/assets/demo/thumb_visitor_1.jpg", video_url:"/assets/demo/highlight_reel.mp4" }
+  ],
+  heatmaps: [
+    { camera_name:"Entrance", count:118, timestamp:"06:15 PM", image_url:"/assets/demo/heatmap_1.jpg" },
+    { camera_name:"Aisle-1", count:92, timestamp:"02:40 PM", image_url:"/assets/demo/heatmap_2.jpg" },
+    { camera_name:"Billing", count:85, timestamp:"12:22 PM", image_url:"/assets/demo/heatmap_3.jpg" }
+  ],
+  heartbeat: {
+    online: true,
+    last_heartbeat: "2025-10-17 19:05:11",
+    last_data: "2025-10-17 18:59:54"
+  }
+};
+
+/* =========================================================
+   NAV HELPERS (keep same names)
+   ========================================================= */
+function toggleUserMenu() {
+  const dd = document.getElementById("userDropdown");
+  if (dd) dd.classList.toggle("show");
+}
+function handleLogout() {
+  localStorage.clear();
+  window.location.href = "login.html";
+}
+function showNotifications() { alert("No new notifications"); }
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".user-menu")) {
+    const dd = document.getElementById("userDropdown");
+    if (dd) dd.classList.remove("show");
+  }
+});
+function formatHour(hhmm) {
+  if (!hhmm) return "--";
+  const h = parseInt(hhmm.split(":")[0], 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const dh = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return `${dh}:00 ${ampm}`;
+}
+
+/* =========================================================
+   RENDERERS
+   ========================================================= */
+function renderSummary() {
+  const s = DEMO.summary;
+  document.getElementById("highlightsDate").textContent = DEMO.date;
+  document.getElementById("highlightsDateText").textContent = DEMO.date;
+
+  document.getElementById("totalVisitors").textContent = s.total_visitors;
+  document.getElementById("peakCrowd").textContent = s.peak_count;
+  document.getElementById("avgCrowd").textContent = s.average_count;
+  document.getElementById("alertsCount").textContent = s.alerts;
+  document.getElementById("busiestHour").textContent = formatHour(s.busiest_hour);
+  document.getElementById("dwellTime").textContent = s.dwell_time;
+
+  document.getElementById("statusDeviceId").textContent = DEMO.device_id;
+
+  if (!DEMO.heartbeat.online) {
+    document.getElementById("deviceStatusBadge").className = "badge text-bg-danger";
+    document.getElementById("deviceStatusBadge").textContent = "OFFLINE";
+  }
+  document.getElementById("lastHeartbeat").textContent = DEMO.heartbeat.last_heartbeat;
+  document.getElementById("lastDataTime").textContent = DEMO.heartbeat.last_data;
+}
+
+function renderTrend7() {
+  const ctx = document.getElementById("highlightTrendChart");
+  if (!ctx) return;
+
+  const labels = DEMO.trend7.map(d => d.day);
+  const data = DEMO.trend7.map(d => d.count);
+
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "Visitors",
+        data,
+        tension: 0.35,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function renderTopHighlightsSwiper() {
+  const wrap = document.getElementById("topHighlightsWrapper");
+  if (!wrap) return;
+
+  wrap.innerHTML = DEMO.topHighlights.map(h => `
+    <div class="swiper-slide">
+      <div class="video-card card h-100"
+           data-model="${h.model}"
+           data-video-src="${h.video}"
+           data-title="${h.title}">
+        <div class="video-thumb"
+             style="background-image:url('${h.thumb}');">
+          <div class="play-badge"><i class="bi bi-play-fill"></i></div>
+          <div class="video-duration-badge">${h.duration}</div>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge text-bg-secondary text-uppercase">${h.model}</span>
+            <small class="text-muted"><i class="bi bi-clock"></i> ${h.time}</small>
+          </div>
+          <h5 class="card-title mb-1">${h.title}</h5>
+          <small class="text-muted"><i class="bi bi-camera"></i> ${h.camera}</small>
+          <div class="mt-2 fw-semibold">${h.metric}</div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  new Swiper("#topHighlightsSwiper", {
+    slidesPerView: 1.2,
+    spaceBetween: 12,
+    breakpoints: {
+      768: { slidesPerView: 2.2 },
+      1200: { slidesPerView: 3 }
+    },
+    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+    pagination: { el: ".swiper-pagination", clickable: true }
+  });
+}
+
+function renderAllVideos(model = "all") {
+  const grid = document.getElementById("allVideosGrid");
+  if (!grid) return;
+
+  const vids = model === "all"
+    ? DEMO.videos
+    : DEMO.videos.filter(v => v.model === model);
+
+  grid.innerHTML = vids.map(v => `
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+      <div class="video-card card h-100"
+           data-model="${v.model}"
+           data-video-src="${v.video_url}"
+           data-title="${v.title}">
+        <div class="video-thumb"
+             style="background-image:url('${v.thumbnail}');">
+          <div class="play-badge"><i class="bi bi-play-fill"></i></div>
+          <div class="video-duration-badge">${v.duration}</div>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge text-bg-secondary text-uppercase">${v.model}</span>
+            <small class="text-muted">${v.time}</small>
+          </div>
+          <h6 class="mb-1">${v.title}</h6>
+          <small class="text-muted">
+            <i class="bi bi-camera"></i> ${v.camera} |
+            <i class="bi bi-people-fill"></i> ${v.count}
+          </small>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderHeatmaps() {
+  const gal = document.getElementById("heatmapGallery");
+  if (!gal) return;
+
+  gal.innerHTML = DEMO.heatmaps.map(h => `
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="heatmap-card card h-100">
+        <img src="${h.image_url}" class="card-img-top" alt="Heatmap ${h.camera_name}"
+             onerror="this.src='/placeholder.svg?height=300&width=500'">
+        <div class="card-body">
+          <h6 class="mb-1">${h.camera_name}</h6>
+          <small class="text-muted">
+            <i class="bi bi-people-fill"></i> ${h.count} people |
+            <i class="bi bi-clock"></i> ${h.timestamp}
+          </small>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* =========================================================
+   VIDEO MODAL
+   ========================================================= */
+function wireVideoClicks() {
+  document.body.addEventListener("click", (e) => {
+    const card = e.target.closest(".video-card");
+    if (!card) return;
+
+    const url = card.getAttribute("data-video-src") || "";
+    const title = card.getAttribute("data-title") || "Highlight";
+
+    playVideo(url, title);
+  });
+}
+
+function playVideo(videoUrl, title) {
+  const modalEl = document.getElementById("videoModal");
+  const modal = new bootstrap.Modal(modalEl);
+
+  document.getElementById("videoModalTitle").textContent = title;
+  document.getElementById("videoSource").src = videoUrl;
+  const player = document.getElementById("highlightVideoPlayer");
+  player.load();
+
+  modal.show();
+  player.play().catch(()=>{});
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+function wireTabs() {
+  const tabs = document.querySelectorAll("#modelTabs .nav-link");
+  tabs.forEach(t => {
+    t.addEventListener("click", () => {
+      tabs.forEach(x => x.classList.remove("active"));
+      t.classList.add("active");
+      renderAllVideos(t.dataset.model);
+    });
+  });
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  renderSummary();
+  renderTrend7();
+  renderTopHighlightsSwiper();
+  renderAllVideos("all");
+  renderHeatmaps();
+
+  wireVideoClicks();
+  wireTabs();
+});
+</script>
+
+</body>
+</html>
