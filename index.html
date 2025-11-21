@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowd Analytics Dashboard - Third Umpire</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Chart.js Data Labels plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <!-- Chart.js Annotation plugin (needed for average lines) -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0"></script>
+
+    <!-- Custom CSS -->
+     <!-- Core CSS - Load First -->
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/toast-loading.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/video_modal.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <!-- Navigation Bar -->
+    <!-- Navigation Bar -->
+<!-- Top Navigation -->
+<!-- Top Navigation -->
+<div class="top-nav">
+    <div class="nav-content">
+        <!-- Mobile Menu Toggle (hidden on desktop) -->
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" style="display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">
+            <i class="bi bi-list"></i>
+        </button>
+        
+        <!-- Logo -->
+        <div class="logo">
+            <i class="bi bi-camera-video-fill" style="color: #F97316;"></i>
+            <span>ThirdUmpire</span>
+        </div>
+        
+        <!-- Logo Actions (Notifications & Bookmark) -->
+        <div class="logo-actions">
+            <div class="nav-icon badge" onclick="showNotifications()">
+                <i class="bi bi-bell-fill"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none;">3</span>
+            </div>
+            <div class="nav-icon" onclick="toggleBookmark()">
+                <i class="bi bi-bookmark-fill"></i>
+            </div>
+        </div>
+        
+        <!-- Main Navigation Menu -->
+        <div class="nav-menu">
+            <a href="/highlights.html" class="nav-item">
+                <i class="bi bi-stars"></i>
+                <span>Highlights</span>
+            </a>
+            <a href="/index.html" class="nav-item active">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/settings.html" class="nav-item">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </a>
+            
+            <!-- Store Selector Dropdown -->
+            <div class="store-selector">
+                <div class="store-selector-btn" id="storeSelectorBtn" onclick="toggleStoreDropdown()">
+                    <i class="bi bi-shop"></i>
+                    <span id="currentStoreName">Loading...</span>
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+                <div class="store-dropdown" id="storeDropdown">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Device Status Indicator -->
+            <div class="device-status" id="deviceStatusNav">
+                <div class="status-dot"></div>
+                <span id="deviceStatusText">Online</span>
+            </div>
+            
+            <!-- User Menu -->
+            <div class="user-menu">
+                <div class="nav-icon" onclick="toggleUserMenu()">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <!-- User Name -->
+                    <div class="user-dropdown-item">
+                        <i class="bi bi-person-circle"></i>
+                        <span id="userNameDropdown">User</span>
+                    </div>
+                    <!-- Settings -->
+                    <div class="user-dropdown-item" onclick="window.location.href='/settings.html'">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
+                    </div>
+                    <!-- Logout -->
+                    <div class="user-dropdown-item logout" onclick="Auth.logout()">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Navigation Menu -->
+<div class="mobile-nav" id="mobileNav" style="position: fixed; top: 80px; left: 0; width: 100%; background: #0F172A; z-index: 999; display: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1rem;">
+    <a href="/highlights.html" class="mobile-nav-item" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem;">
+        <i class="bi bi-stars"></i>
+        <span>Highlights</span>
+    </a>
+    <a href="/index.html" class="mobile-nav-item" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem;">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+    </a>
+    <div class="mobile-nav-item" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem;">
+        <i class="bi bi-person-fill"></i>
+        <span>User Menu</span>
+    </div>
+    <div class="mobile-nav-item logout" onclick="Auth.logout()" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; color: #EF4444; cursor: pointer; border-radius: 8px;">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Logout</span>
+    </div>
+</div>
+
+
+<!-- Filter Bar - Sticky Header -->
+<div class="filter-bar-wrapper">
+    <div class="filter-bar">
+        <div class="filter-filters">
+            <div class="filter-group">
+                <label for="filterDate">
+                    <i class="bi bi-calendar"></i> Date
+                </label>
+                <input type="date" id="filterDate" class="form-control" value="2025-10-28">
+            </div>
+            
+            <div class="filter-group">
+                <label for="filterCamera">
+                    <i class="bi bi-camera"></i> Camera
+                </label>
+                <select id="filterCamera" class="form-select">
+                    <option value="Global">Global (All Cameras)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="filter-actions">
+            <button id="refreshDashboardBtn" class="btn btn-primary" onclick="refreshDashboard()">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Main Container -->
+    <div class="container-fluid px-3 px-md-4">
+
+        <!-- Config Section -->
+        <!-- REPLACE THIS SECTION IN index.html -->
+        <!-- Find lines 78-105 and replace with this: -->
+
+        <!-- Dashboard Section -->
+        <!-- Dashboard Section with Tabs -->
+        <div id="dashboardSection" style="display:block;">
+
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-4" id="modelTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="crowd-tab" data-bs-toggle="tab" data-bs-target="#tab-crowd"
+                        type="button" role="tab">
+                        <i class="bi bi-people-fill me-2"></i>Crowd Density
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="heatmap-tab" data-bs-toggle="tab" data-bs-target="#tab-heatmap"
+                        type="button" role="tab">
+                        <i class="bi bi-fire me-2"></i>Heatmap
+                    </button>
+                </li>
+                <!-- NEW TABS -->
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-employee">
+                        <i class="bi bi-people-fill me-2"></i>
+                        Employee Interactions
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-person">
+                        <i class="bi bi-person-badge me-2"></i>
+                        Person Detection
+                        <span id="personAlertBadge" class="badge bg-danger ms-1" style="display:none;">0</span>
+                    </button>
+                </li>
+                <!-- COMMENTED OUT: Daily Visits Tab
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="daily-tab" data-bs-toggle="tab" data-bs-target="#tab-daily"
+                        type="button" role="tab">
+                        <i class="bi bi-door-open-fill me-2"></i>Daily Visits
+                    </button>
+                </li>
+                -->
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="modelTabContent">
+
+                <!-- Crowd Density Tab (Existing Dashboard) -->
+                <div class="tab-pane fade show active" id="tab-crowd" role="tabpanel">
+                    <!-- Keep all existing stat cards and charts here -->
+                    <!-- Stats Cards Row -->
+                    <!-- Stats Cards Row -->
+                    <!-- Stats Cards Row - Updated Layout -->
+                    <div class="row g-3 g-md-4 mb-4">
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-people-fill me-1"></i>
+                                        Today's Visitors
+                                    </h6>
+                                    <h2 class="card-title mb-0" id="todayVisitors">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Peak Hour
+                                    </h6>
+                                    <h2 class="card-title mb-0" id="peakHour">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-graph-up me-1"></i>
+                                        Peak Today
+                                    </h6>
+                                    <h2 class="card-title mb-0" id="todayPeak">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-calculator me-1"></i>
+                                        Average Today
+                                    </h6>
+                                    <h2 class="card-title mb-0" id="hourAverage">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row 1 -->
+                    <div class="row g-3 g-md-4 mb-4">
+                        <div class="col-12 col-xl-8">
+                            <div class="card chart-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                        Hourly Timeline <span id="hourlyDateLabel"></span>
+                                    </h5>
+                                    <canvas id="hourlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-4">
+                            <div class="card chart-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-calendar-check"></i>
+                                        Monthly Calendar
+                                    </h5>
+                                    <div id="calendarContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row 2 -->
+                    <div class="row g-3 g-md-4 mb-4">
+                        <div class="col-12 col-xl-6">
+                            <div class="card chart-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-bar-chart-fill"></i>
+                                        Weekday Comparison
+                                    </h5>
+                                    <canvas id="weekdayChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-6">
+                            <div class="card chart-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-graph-up"></i>
+                                        30-Day Trend
+                                    </h5>
+                                    <canvas id="trendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Heatmap Tab (NEW) -->
+                <!-- Heatmap Tab - View by Date -->
+                <div class="tab-pane fade" id="tab-heatmap" role="tabpanel">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info"
+                                style="background: var(--bg-card); border: 1px solid var(--accent-primary); color: var(--text-primary);">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Heatmap Snapshots</strong> - View the latest snapshot from each camera for a
+                                selected date
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                Select Date
+                            </label>
+                            <input type="date" class="form-control" id="heatmapDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                <i class="bi bi-camera me-1"></i>
+                                Filter by Camera
+                            </label>
+                            <select class="form-select" id="heatmapCameraSelect">
+                                <option value="all">All Cameras</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary w-100" onclick="CA.heatmap.load()">
+                                <i class="bi bi-search me-2"></i>Load Snapshots
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-outline-secondary w-100"
+                                onclick="document.getElementById('heatmapDate').value = CA.state.date; CA.heatmap.load()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Today
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="heatmapGallery" class="row g-4">
+                        <!-- Snapshots will be inserted here (2 columns) -->
+                    </div>
+
+                    <div id="heatmapEmpty" class="text-center py-5" style="display:none;">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #6b7280;"></i>
+                        <p class="text-muted mt-3 mb-2">No heatmap snapshots available for selected date</p>
+                        <small class="text-muted">Try selecting a different date or camera</small>
+                        <br>
+                        <button class="btn btn-outline-primary mt-3" onclick="CA.heatmap.load()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab-employee">
+                    <div class="row">
+                        <!-- Employee Management Section -->
+                        <div class="col-12">
+                            <div class="card mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5><i class="bi bi-person-plus me-2"></i>Employee Management</h5>
+                                    <button class="btn btn-primary" onclick="EmployeeManager.showAddModal()">
+                                        <i class="bi bi-plus-circle me-1"></i>Add Employee
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="employeeTableContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Today's Interactions Summary -->
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="card stat-card">
+                                        <div class="card-body text-center">
+                                            <small class="text-muted">Total Interactions</small>
+                                            <div id="todayTotalInteractions" class="stat-value">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card stat-card">
+                                        <div class="card-body text-center">
+                                            <small class="text-muted">Total Time</small>
+                                            <div id="todayTotalTime" class="stat-value">0h 0m</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card stat-card">
+                                        <div class="card-body text-center">
+                                            <small class="text-muted">Active Employees</small>
+                                            <div id="todayActiveEmployees" class="stat-value">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card stat-card">
+                                        <div class="card-body text-center">
+                                            <small class="text-muted">Avg Duration</small>
+                                            <div id="todayAvgDuration" class="stat-value">0m 0s</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Filters -->
+                        <div class="col-12">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label>Date Range</label>
+                                            <input type="date" id="interactionStartDate" class="form-control">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>To</label>
+                                            <input type="date" id="interactionEndDate" class="form-control">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Employee</label>
+                                            <select id="interactionEmployeeFilter" class="form-select">
+                                                <option value="">All Employees</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>&nbsp;</label>
+                                            <button class="btn btn-primary w-100" onclick="InteractionsDashboard.applyFilters()">
+                                                Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Interactions Table -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Interactions History</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="interactionsTableContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Charts -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Interactions by Employee</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="employeeInteractionsChart" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Hourly Pattern</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="hourlyPatternChart" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- NEW: Person Detection Tab -->
+                <div class="tab-pane fade" id="tab-person">
+                    <div class="row">
+                        <!-- Unread Alerts -->
+                        <div class="col-12">
+                            <div class="card mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5><i class="bi bi-bell me-2"></i>Recent Alerts</h5>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="PersonAlerts.markAllRead()">
+                                        <i class="bi bi-check-all me-1"></i>Mark All Read
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div id="personAlertsContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Filters -->
+                        <div class="col-12">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label>Date</label>
+                                            <input type="date" id="alertDateFilter" class="form-control">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Camera</label>
+                                            <select id="alertCameraFilter" class="form-select">
+                                                <option value="">All Cameras</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Status</label>
+                                            <select id="alertStatusFilter" class="form-select">
+                                                <option value="unread">Unread Only</option>
+                                                <option value="all">All Alerts</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>&nbsp;</label>
+                                            <button class="btn btn-primary w-100" onclick="PersonAlerts.applyFilters()">
+                                                Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Alert History Table -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Alert History</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="alertHistoryContainer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <!-- Daily Visits Tab (NEW) -->
+                <!-- COMMENTED OUT: Daily Visits Tab Content
+                <div class="tab-pane fade" id="tab-daily" role="tabpanel">
+                    <div class="row g-3 g-md-4 mb-4">
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-door-open me-1"></i>
+                                        Today's Visitors
+                                    </h6>
+                                    <h2 class="card-title mb-0" id="dailyVisitsToday">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Peak Hour
+                                    </h6>
+                                    <h2 class="card-title mb-0" id="dailyVisitsPeak">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-graph-up me-1"></i>
+                                        Average/Hour
+                                    </h6>
+                                    <h2 class="card-title mb-0" id="dailyVisitsAvg">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card text-center stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">
+                                        <i class="bi bi-calendar-check me-1"></i>
+                                        Status
+                                    </h6>
+                                    <h5 class="mb-0" id="dailyVisitsStatus">
+                                        <span class="badge bg-success">Active</span>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3 g-md-4 mb-4">
+                        <div class="col-12">
+                            <div class="card chart-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-bar-chart-fill"></i>
+                                        Hourly Visitor Count
+                                    </h5>
+                                    <canvas id="dailyVisitsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modular JS -->
+    <script src="js/toast.js"></script>
+    <script src="js/loading-state.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chart-config.js"></script>
+    <script src="js/video_player.js"></script>
+    <script src="js/hourly.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/weekday.js"></script>
+    <script src="js/trend.js"></script>
+    <script src="js/heatmap.js"></script>
+    <script src="js/daily_visits.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Store dropdown toggle
+        function toggleStoreDropdown() {
+            const dropdown = document.getElementById('storeDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+        
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const storeDropdown = document.getElementById('storeDropdown');
+            const storeSelectorBtn = document.getElementById('storeSelectorBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const userMenu = document.querySelector('.user-menu');
+            
+            // Close store dropdown
+            if (storeDropdown && storeSelectorBtn) {
+                if (!storeSelectorBtn.contains(event.target) && !storeDropdown.contains(event.target)) {
+                    storeDropdown.classList.remove('active');
+                }
+            }
+            
+            // Close user dropdown
+            if (userDropdown && userMenu) {
+                if (!userMenu.contains(event.target)) {
+                    userDropdown.classList.remove('active');
+                }
+            }
+        });
+        
+        // Store selector initialization (add to existing DOMContentLoaded)
+        function initializeStoreSelector(devices) {
+            if (!devices || devices.length === 0) {
+                console.warn('⚠️ No devices available');
+                return;
+            }
+            
+            const currentDeviceId = localStorage.getItem('selectedDeviceId') || devices[0].device_id;
+            const currentDevice = devices.find(d => d.device_id === currentDeviceId);
+            
+            // Update current store name
+            const currentStoreName = document.getElementById('currentStoreName');
+            if (currentStoreName && currentDevice) {
+                currentStoreName.textContent = currentDevice.store_name || currentDevice.device_id;
+            }
+            
+            // Update user name
+            const userNameDropdown = document.getElementById('userNameDropdown');
+            if (userNameDropdown && window.Auth && window.Auth.currentUser) {
+                userNameDropdown.textContent = window.Auth.currentUser.full_name || window.Auth.currentUser.email;
+            }
+            
+            // Populate dropdown
+            const storeDropdown = document.getElementById('storeDropdown');
+            if (storeDropdown) {
+                storeDropdown.innerHTML = devices.map(device => `
+                    <div class="store-dropdown-item ${device.device_id === currentDeviceId ? 'active' : ''}" 
+                         onclick="switchStore('${device.device_id}')">
+                        <span class="store-name">${device.store_name || device.device_id}</span>
+                        <span class="store-device-id">${device.device_id}</span>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function switchStore(deviceId) {
+            console.log('🔄 Switching to store:', deviceId);
+            localStorage.setItem('selectedDeviceId', deviceId);
+            if (CA.state) {
+                CA.state.deviceId = deviceId;
+            }
+            window.location.reload();
+        }
+
+        // Store dropdown toggle
+function toggleStoreDropdown() {
+    const dropdown = document.getElementById('storeDropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('active');
+    }
+}
+
+// User menu toggle
+function toggleUserMenu() {
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('active');
+    }
+}
+
+// Mobile menu toggle
+function toggleMobileMenu() {
+    const mobileNav = document.getElementById('mobileNav');
+    if (mobileNav) {
+        mobileNav.style.display = mobileNav.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Show notifications (placeholder - will implement in Phase 5)
+function showNotifications() {
+    alert('Notifications feature coming soon!\n\nYou will be notified when:\n- Crowd density exceeds threshold\n- Device goes offline\n- New heatmap data available');
+    
+    // Hide notification badge
+    const badge = document.getElementById('notificationBadge');
+    if (badge) {
+        badge.style.display = 'none';
+    }
+}
+
+// Toggle bookmark (placeholder - will implement in Phase 5)
+function toggleBookmark() {
+    const icon = event.currentTarget.querySelector('i');
+    if (icon.classList.contains('bi-bookmark-fill')) {
+        icon.classList.remove('bi-bookmark-fill');
+        icon.classList.add('bi-bookmark');
+        alert('Bookmark removed');
+    } else {
+        icon.classList.remove('bi-bookmark');
+        icon.classList.add('bi-bookmark-fill');
+        alert('Bookmarked! You can access saved highlights later.');
+    }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    const storeDropdown = document.getElementById('storeDropdown');
+    const storeSelectorBtn = document.getElementById('storeSelectorBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    const userMenu = document.querySelector('.user-menu');
+    
+    // Close store dropdown
+    if (storeDropdown && storeSelectorBtn) {
+        if (!storeSelectorBtn.contains(event.target) && !storeDropdown.contains(event.target)) {
+            storeDropdown.classList.remove('active');
+        }
+    }
+    
+    // Close user dropdown
+    if (userDropdown && userMenu) {
+        if (!userMenu.contains(event.target)) {
+            userDropdown.classList.remove('active');
+        }
+    }
+});
+
+// Store selector initialization
+function initializeStoreSelector(devices) {
+    if (!devices || devices.length === 0) {
+        console.warn('⚠️ No devices available');
+        return;
+    }
+    
+    const currentDeviceId = localStorage.getItem('selectedDeviceId') || devices[0].device_id;
+    const currentDevice = devices.find(d => d.device_id === currentDeviceId);
+    
+    // Update current store name
+    const currentStoreName = document.getElementById('currentStoreName');
+    if (currentStoreName && currentDevice) {
+        currentStoreName.textContent = currentDevice.store_name || currentDevice.device_id;
+    }
+    
+    // Update user name in dropdown
+    const userNameDropdown = document.getElementById('userNameDropdown');
+    if (userNameDropdown && window.Auth && window.Auth.currentUser) {
+        userNameDropdown.textContent = window.Auth.currentUser.full_name || window.Auth.currentUser.email;
+    }
+    
+    // Update device status
+    updateDeviceStatus(currentDevice);
+    
+    // Populate dropdown
+    const storeDropdown = document.getElementById('storeDropdown');
+    if (storeDropdown) {
+        storeDropdown.innerHTML = devices.map(device => `
+            <div class="store-dropdown-item ${device.device_id === currentDeviceId ? 'active' : ''}" 
+                 onclick="switchStore('${device.device_id}')">
+                <span class="store-name">${device.store_name || device.device_id}</span>
+                <span class="store-device-id">${device.device_id}</span>
+            </div>
+        `).join('');
+    }
+}
+
+// Update device status indicator
+function updateDeviceStatus(device) {
+    const statusNav = document.getElementById('deviceStatusNav');
+    const statusText = document.getElementById('deviceStatusText');
+    
+    if (!statusNav || !statusText || !device) return;
+    
+    // Check if device is online (based on last_heartbeat)
+    let isOnline = false;
+    if (device.last_heartbeat) {
+        try {
+            const lastHeartbeat = new Date(device.last_heartbeat);
+            const now = new Date();
+            const minutesAgo = (now - lastHeartbeat) / (1000 * 60);
+            isOnline = minutesAgo < 5; // Online if heartbeat within 5 minutes
+        } catch (e) {
+            console.error('Error parsing heartbeat:', e);
+        }
+    }
+    
+    // Update UI
+    if (isOnline) {
+        statusNav.classList.remove('offline');
+        statusText.textContent = 'Online';
+    } else {
+        statusNav.classList.add('offline');
+        statusText.textContent = 'Offline';
+    }
+}
+
+// Switch store/device
+function switchStore(deviceId) {
+    console.log('🔄 Switching to store:', deviceId);
+    localStorage.setItem('selectedDeviceId', deviceId);
+    if (window.CA && window.CA.state) {
+        window.CA.state.deviceId = deviceId;
+    }
+    window.location.reload();
+}
+
+// Show notification badge on load (example)
+window.addEventListener('DOMContentLoaded', function() {
+    // Simulate notifications (remove this in production)
+    setTimeout(() => {
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+            badge.style.display = 'inline-block';
+            badge.textContent = '3'; // Number of notifications
+        }
+    }, 2000);
+});
+        </script>
+</body>
+</html>

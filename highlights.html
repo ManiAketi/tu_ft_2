@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="ThirdUmpire - Crowd Analytics and Heatmap Analysis Dashboard">
+    <meta name="theme-color" content="#0F172A">
+    <title>ThirdUmpire - Highlights</title>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom Styles -->
+     <!-- Core CSS - Load First -->
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/toast-loading.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+/* ========================================
+   HIGHLIGHTS PAGE STYLES
+   Complete styles for video highlights page
+   ======================================== */
+
+   :root {
+    --primary-blue: #2563EB;
+    --success-green: #10B981;
+    --warning-amber: #F59E0B;
+    --error-red: #EF4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0A0A0A;
+    color: #E5E5E5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ========================================
+   NAVIGATION
+   ======================================== */
+
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #0F172A;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #60A5FA;
+}
+
+.logo-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #E5E5E5;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.1);
+    color: #60A5FA;
+}
+
+.nav-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #E5E5E5;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.nav-icon:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.nav-icon.badge::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    background: #EF4444;
+    border-radius: 50%;
+}
+
+.device-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10B981;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.device-status .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #10B981;
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+/* Store Selector Dropdown */
+.store-selector {
+    position: relative;
+    display: inline-block;
+}
+
+.store-selector-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(37, 99, 235, 0.2);
+    border: 1px solid var(--primary-blue);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.store-selector-btn:hover {
+    background: rgba(37, 99, 235, 0.3);
+    border-color: #1D4ED8;
+}
+
+.store-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 280px;
+    background: #1E1E1E;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1001;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.store-dropdown.active {
+    display: flex;
+}
+
+.store-dropdown-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.store-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.store-dropdown-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.store-dropdown-item.active {
+    background: rgba(37, 99, 235, 0.2);
+    border-left: 3px solid var(--primary-blue);
+}
+
+.store-name {
+    font-weight: 600;
+    color: white;
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.store-device-id {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.6);
+}
+
+/* User Menu */
+.user-menu {
+    position: relative;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    background: #1E1E1E;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    min-width: 200px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.user-dropdown.active {
+    display: flex;
+}
+
+.user-dropdown-item {
+    padding: 0.75rem 1rem;
+    color: #E5E5E5;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.user-dropdown-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.user-dropdown-item.logout {
+    color: #EF4444;
+}
+
+.user-dropdown-item.logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #E5E5E5;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+}
+
+/* ========================================
+   HERO SLIDER SECTION (75vh)
+   ======================================== */
+
+.hero-slider-section {
+    height: 75vh;
+    position: relative;
+    margin-bottom: 3rem;
+    margin-top: 80px;
+}
+
+.swiper {
+    width: 100%;
+    height: 100%;
+}
+
+.video-slide {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+}
+
+.slide-overlay-top,
+.slide-overlay-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.slide-overlay-top {
+    top: 0;
+    height: 200px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+}
+
+.slide-overlay-bottom {
+    bottom: 0;
+    height: 300px;
+    background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+}
+
+.slide-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3rem 2rem;
+    z-index: 3;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.model-badge-large {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(239, 68, 68, 0.3);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.slide-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.slide-subtitle {
+    font-size: 1.5rem;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 2rem;
+}
+
+.slide-stats {
+    display: flex;
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.action-btn-primary,
+.action-btn-secondary {
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-right: 1rem;
+    transition: all 0.3s;
+}
+
+.action-btn-primary {
+    background: white;
+    color: #0A0A0A;
+}
+
+.action-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255,255,255,0.3);
+}
+
+.action-btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.action-btn-secondary:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+}
+
+/* Side Navigation */
+.side-nav {
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.side-nav-item {
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    font-size: 1.5rem;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.side-nav-item:hover {
+    background: var(--primary-blue);
+    transform: scale(1.1);
+}
+
+.side-nav-label {
+    position: absolute;
+    right: 4rem;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.side-nav-item:hover .side-nav-label {
+    opacity: 1;
+}
+
+/* Swiper Navigation */
+.swiper-button-next,
+.swiper-button-prev {
+    color: white;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    backdrop-filter: blur(10px);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.swiper-pagination-bullet {
+    background: white;
+    opacity: 0.5;
+    width: 12px;
+    height: 12px;
+}
+
+.swiper-pagination-bullet-active {
+    opacity: 1;
+    background: var(--primary-blue);
+}
+
+/* ========================================
+   VIDEO CARDS SECTION
+   ======================================== */
+
+.secondary-highlights {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.section-description {
+    color: rgba(255,255,255,0.6);
+    font-size: 1rem;
+}
+
+/* Model Tabs */
+.model-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.model-tab {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.model-tab:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--primary-blue);
+}
+
+.model-tab.active {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+/* Video Grid */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.video-card {
+    background: #1E1E1E;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.video-card-thumbnail {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.play-icon-small {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    transition: all 0.3s;
+}
+
+.video-card:hover .play-icon-small {
+    background: rgba(255,255,255,0.5);
+    transform: scale(1.1);
+}
+
+.video-duration {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background: rgba(0,0,0,0.8);
+    padding: 0.25rem 0.75rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    color: white;
+}
+
+.video-card-content {
+    padding: 1.5rem;
+}
+
+.video-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error-red);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.video-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.video-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.video-card-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+}
+
+.video-card-metric {
+    font-weight: 700;
+    color: var(--error-red);
+    font-size: 1rem;
+}
+
+/* ========================================
+   MODAL
+   ======================================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #1E1E1E;
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+    max-width: 1200px;
+    width: 90%;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.modal-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.modal video {
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 10px;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+/* ========================================
+   SHARE MENU
+   ======================================== */
+
+.share-menu {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 350px;
+    height: 100vh;
+    background: #1E1E1E;
+    z-index: 10001;
+    transition: right 0.3s;
+    padding: 2rem;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+}
+
+.share-menu.active {
+    right: 0;
+}
+
+.share-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.share-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.share-option:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateX(-5px);
+}
+
+.share-option i {
+    font-size: 1.5rem;
+}
+
+/* ========================================
+   MOBILE NAVIGATION
+   ======================================== */
+
+.mobile-nav {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    background: #0F172A;
+    z-index: 999;
+    display: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.mobile-nav.active {
+    display: block;
+}
+
+.mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
+.mobile-nav-item:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.mobile-nav-item.logout {
+    color: #EF4444;
+}
+
+/* ========================================
+   SCROLL TO TOP BUTTON
+   ======================================== */
+
+.scroll-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: var(--primary-blue);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    border: none;
+}
+
+.scroll-to-top.visible {
+    display: flex;
+}
+
+.scroll-to-top:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    background: #1D4ED8;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+    .top-nav {
+        padding: 0.75rem 1.5rem;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .nav-item span {
+        display: none;
+    }
+
+    .device-status span {
+        display: none;
+    }
+
+    .device-status {
+        padding: 0.5rem;
+    }
+
+    .hero-slider-section {
+        height: 60vh;
+    }
+
+    .slide-content {
+        padding: 2rem 1.5rem;
+    }
+
+    .slide-title {
+        font-size: 2.5rem;
+    }
+
+    .slide-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .slide-stats {
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+
+    .action-btn-primary,
+    .action-btn-secondary {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .side-nav {
+        display: none;
+    }
+
+    .secondary-highlights {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+    }
+
+    .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+/* Mobile (320px - 767px) */
+@media (max-width: 767px) {
+    .top-nav {
+        padding: 0.75rem 1rem;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
+    .nav-content {
+        flex-wrap: nowrap;
+    }
+
+    .logo {
+        font-size: 1.1rem;
+        flex: 1;
+    }
+
+    .nav-menu {
+        display: none !important;
+    }
+
+    .nav-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+    }
+
+    .device-status {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .hero-slider-section {
+        height: 50vh;
+    }
+
+    .slide-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .model-badge-large {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
+    }
+
+    .slide-title {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .slide-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .slide-stats {
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+
+    .action-btn-primary,
+    .action-btn-secondary {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.85rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .secondary-highlights {
+        padding: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .section-description {
+        font-size: 0.9rem;
+    }
+
+    .model-tabs {
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .model-tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .video-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .video-card-thumbnail {
+        height: 180px;
+    }
+
+    .video-card-content {
+        padding: 1rem;
+    }
+
+    .video-card-badge {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .video-card-title {
+        font-size: 1.1rem;
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .modal-title {
+        font-size: 1.2rem;
+    }
+
+    .share-menu {
+        width: 100%;
+        right: -100%;
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        width: 40px;
+        height: 40px;
+    }
+
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 16px;
+    }
+
+    .user-dropdown {
+        min-width: 180px;
+        right: -0.5rem;
+    }
+
+    .store-dropdown {
+        min-width: 250px;
+        right: -1rem;
+    }
+}
+
+/* Extra Small Mobile (up to 374px) */
+@media (max-width: 374px) {
+    .logo {
+        font-size: 1rem;
+    }
+
+    .hero-slider-section {
+        height: 45vh;
+    }
+
+    .slide-title {
+        font-size: 1.5rem;
+    }
+
+    .slide-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .action-btn-primary,
+    .action-btn-secondary {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .model-tab {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.75rem;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+    .hero-slider-section {
+        height: 80vh;
+    }
+}
+
+/* ========================================
+   SMOOTH SCROLLING
+   ======================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus states for keyboard navigation */
+.nav-item:focus,
+.nav-icon:focus,
+.model-tab:focus,
+.action-btn-primary:focus,
+.action-btn-secondary:focus,
+.mobile-nav-item:focus {
+    outline: 2px solid #60A5FA;
+    outline-offset: 2px;
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+.video-card,
+.video-background,
+.swiper-slide {
+    will-change: transform;
+}
+        
+        /* Store Selector Dropdown */
+        .store-selector {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .store-selector-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid var(--primary-blue);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .store-selector-btn:hover {
+            background: rgba(37, 99, 235, 0.3);
+        }
+        
+        .store-dropdown {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            min-width: 280px;
+            background: #1E1E1E;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1001;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .store-dropdown.active {
+            display: flex;
+        }
+        
+        .store-dropdown-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .store-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .store-dropdown-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .store-dropdown-item.active {
+            background: rgba(37, 99, 235, 0.2);
+            border-left: 3px solid var(--primary-blue);
+        }
+        
+        .store-name {
+            font-weight: 600;
+            color: white;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .store-device-id {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="top-nav">
+        <div class="nav-content">
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" style="display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">
+                <i class="bi bi-list"></i>
+            </button>
+            
+            <div class="logo">
+                <i class="bi bi-camera-video-fill" style="color: #F97316;"></i>
+                <span>ThirdUmpire</span>
+            </div>
+            
+            <div class="logo-actions">
+                <div class="nav-icon badge" onclick="showNotifications()">
+                    <i class="bi bi-bell-fill"></i>
+                </div>
+                <div class="nav-icon" onclick="toggleBookmark()">
+                    <i class="bi bi-bookmark-fill"></i>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="/highlights.html" class="nav-item">
+                    <i class="bi bi-stars"></i>
+                    <span>Highlights</span>
+                </a>
+                <a href="/index.html" class="nav-item">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <!-- Store Selector -->
+                <div class="store-selector">
+                    <div class="store-selector-btn" id="storeSelectorBtn" onclick="toggleStoreDropdown()">
+                        <i class="bi bi-shop"></i>
+                        <span id="currentStoreName">Loading...</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="store-dropdown" id="storeDropdown">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+                
+                <!-- Device Status -->
+                <div class="device-status" id="deviceStatusNav">
+                    <div class="status-dot"></div>
+                    <span id="deviceStatusText">Online</span>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="user-menu">
+                    <div class="nav-icon" onclick="toggleUserMenu()">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-item">
+                            <i class="bi bi-person-circle"></i>
+                            <span id="userNameDropdown">User</span>
+                        </div>
+                        <div class="user-dropdown-item" onclick="window.location.href='/settings.html'">
+                            <i class="bi bi-gear"></i>
+                            <span>Settings</span>
+                        </div>
+                        <div class="user-dropdown-item logout" onclick="Auth.logout()">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Logout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Menu -->
+    <div class="mobile-nav" id="mobileNav" style="position: fixed; top: 80px; left: 0; width: 100%; background: #0F172A; z-index: 999; display: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1rem;">
+        <a href="/highlights.html" class="mobile-nav-item" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem;">
+            <i class="bi bi-stars"></i>
+            <span>Highlights</span>
+        </a>
+        <a href="/index.html" class="mobile-nav-item" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem;">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </a>
+        <div class="mobile-nav-item" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem;">
+            <i class="bi bi-person-fill"></i>
+            <span>User Menu</span>
+        </div>
+        <div class="mobile-nav-item logout" onclick="Auth.logout()" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; color: #EF4444; cursor: pointer; border-radius: 8px;">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </div>
+    </div>
+
+    <!-- Hero Slider (75vh) -->
+    <section class="hero-slider-section">
+        <div class="swiper heroSwiper">
+            <div class="swiper-wrapper">
+                
+                <!-- Slide 1: Crowd Density -->
+                <div class="swiper-slide">
+                    <div class="video-slide" style="background: linear-gradient(135deg, #7C2D12 0%, #DC2626 50%, #EF4444 100%);">
+                        <video class="video-background" autoplay loop muted playsinline preload="auto">
+                            <source src="/assets/placeholder-crowd.mp4" type="video/mp4">
+                        </video>
+                        
+                        <div class="slide-overlay-top"></div>
+                        <div class="slide-overlay-bottom"></div>
+                        
+                        <div class="slide-content">
+                            <div class="model-badge-large">
+                                <i class="bi bi-people-fill"></i>
+                                <span>CROWD DENSITY ALERT</span>
+                            </div>
+                            
+                            <h1 class="slide-title">Maximum Crowd Density</h1>
+                            <p class="slide-subtitle">Peak occupancy detected during lunch hours</p>
+                            
+                            <div class="slide-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="heroPeakCrowd">--</div>
+                                    <div class="stat-label">Peak Count</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="heroAvgCrowd">--</div>
+                                    <div class="stat-label">Average</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="heroBusiestHour">--</div>
+                                    <div class="stat-label">Busiest Hour</div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <button class="action-btn-primary" onclick="navigateToDashboard()">
+                                    <i class="bi bi-speedometer2"></i>
+                                    View Dashboard
+                                </button>
+                                <button class="action-btn-secondary" onclick="openModal()">
+                                    <i class="bi bi-play-circle-fill"></i>
+                                    Watch Full Screen
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Side Nav -->
+                        <div class="side-nav">
+                            <div class="side-nav-item" onclick="toggleShare()">
+                                <i class="bi bi-share-fill"></i>
+                                <span class="side-nav-label">Share</span>
+                            </div>
+                            <div class="side-nav-item" onclick="toggleBookmark()">
+                                <i class="bi bi-bookmark"></i>
+                                <span class="side-nav-label">Bookmark</span>
+                            </div>
+                            <div class="side-nav-item" onclick="openAnalytics()">
+                                <i class="bi bi-bar-chart-fill"></i>
+                                <span class="side-nav-label">Analytics</span>
+                            </div>
+                            <div class="side-nav-item" onclick="downloadVideo()">
+                                <i class="bi bi-download"></i>
+                                <span class="side-nav-label">Download</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Heatmap -->
+                <div class="swiper-slide">
+                    <div class="video-slide" style="background: linear-gradient(135deg, #92400E 0%, #F59E0B 50%, #FBBF24 100%);">
+                        <video class="video-background" autoplay loop muted playsinline preload="auto">
+                            <source src="/assets/placeholder-heatmap.mp4" type="video/mp4">
+                        </video>
+                        
+                        <div class="slide-overlay-top"></div>
+                        <div class="slide-overlay-bottom"></div>
+                        
+                        <div class="slide-content">
+                            <div class="model-badge-large" style="background: rgba(245, 158, 11, 0.3); border: 1px solid rgba(245, 158, 11, 0.5);">
+                                <i class="bi bi-map-fill"></i>
+                                <span>HEATMAP ANALYSIS</span>
+                            </div>
+                            
+                            <h1 class="slide-title">High Engagement Zones</h1>
+                            <p class="slide-subtitle">Hotspot activity in retail sections</p>
+                            
+                            <div class="slide-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="heatmapCount">--</div>
+                                    <div class="stat-label">Heatmaps</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="topZone">--</div>
+                                    <div class="stat-label">Top Zone</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="avgDwellTime">--</div>
+                                    <div class="stat-label">Avg. Time</div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <button class="action-btn-primary" onclick="navigateToDashboard()">
+                                    <i class="bi bi-speedometer2"></i>
+                                    View Dashboard
+                                </button>
+                                <button class="action-btn-secondary" onclick="openModal()">
+                                    <i class="bi bi-play-circle-fill"></i>
+                                    Watch Full Screen
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Side Nav -->
+                        <div class="side-nav">
+                            <div class="side-nav-item" onclick="toggleShare()">
+                                <i class="bi bi-share-fill"></i>
+                                <span class="side-nav-label">Share</span>
+                            </div>
+                            <div class="side-nav-item" onclick="toggleBookmark()">
+                                <i class="bi bi-bookmark"></i>
+                                <span class="side-nav-label">Bookmark</span>
+                            </div>
+                            <div class="side-nav-item" onclick="openAnalytics()">
+                                <i class="bi bi-bar-chart-fill"></i>
+                                <span class="side-nav-label">Analytics</span>
+                            </div>
+                            <div class="side-nav-item" onclick="downloadVideo()">
+                                <i class="bi bi-download"></i>
+                                <span class="side-nav-label">Download</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
+
+    <!-- Video Cards Section -->
+    <section class="secondary-highlights">
+        <div class="section-header">
+            <h2 class="section-title">🎬 All Video Highlights</h2>
+            <p class="section-description">Browse through all detected moments from <span id="highlightsDateText">yesterday</span></p>
+        </div>
+
+        <!-- Model Filter Tabs -->
+        <div class="model-tabs">
+            <button class="model-tab" data-filter="all">All Videos</button>
+            <button class="model-tab active" data-filter="crowd">🔴 Crowd Density</button>
+            <button class="model-tab" data-filter="visitor">👥 Visitor Count</button>
+            <button class="model-tab" data-filter="heatmap">🗺️ Heatmap</button>
+            <button class="model-tab" data-filter="interaction">💬 Employee Interaction</button>
+        </div>
+
+        <div class="video-grid" id="videoGrid">
+            <!-- Video cards will be populated by JS -->
+            <!-- Default placeholder cards for testing -->
+            <div class="video-card" data-model="crowd">
+                <div class="video-card-thumbnail" style="background: linear-gradient(135deg, #7C2D12 0%, #DC2626 100%);">
+                    <div class="play-icon-small">
+                        <i class="bi bi-play-fill"></i>
+                    </div>
+                    <div class="video-duration">2:00</div>
+                </div>
+                <div class="video-card-content">
+                    <div class="video-card-badge">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Crowd Density</span>
+                    </div>
+                    <h3 class="video-card-title">Lunch Rush Peak</h3>
+                    <div class="video-card-meta">
+                        <div class="video-card-time">
+                            <i class="bi bi-clock"></i>
+                            <span>2:45 PM</span>
+                        </div>
+                        <div class="video-card-metric">+150%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-card" data-model="visitor">
+                <div class="video-card-thumbnail" style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);">
+                    <div class="play-icon-small">
+                        <i class="bi bi-play-fill"></i>
+                    </div>
+                    <div class="video-duration">2:00</div>
+                </div>
+                <div class="video-card-content">
+                    <div class="video-card-badge" style="background: rgba(37, 99, 235, 0.2); color: var(--primary-blue);">
+                        <i class="bi bi-person-walking"></i>
+                        <span>Visitor Count</span>
+                    </div>
+                    <h3 class="video-card-title">Evening Traffic Surge</h3>
+                    <div class="video-card-meta">
+                        <div class="video-card-time">
+                            <i class="bi bi-clock"></i>
+                            <span>5:20 PM</span>
+                        </div>
+                        <div class="video-card-metric" style="color: var(--primary-blue);">+85%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-card" data-model="heatmap">
+                <div class="video-card-thumbnail" style="background: linear-gradient(135deg, #92400E 0%, #F59E0B 100%);">
+                    <div class="play-icon-small">
+                        <i class="bi bi-play-fill"></i>
+                    </div>
+                    <div class="video-duration">2:00</div>
+                </div>
+                <div class="video-card-content">
+                    <div class="video-card-badge" style="background: rgba(245, 158, 11, 0.2); color: var(--warning-amber);">
+                        <i class="bi bi-map-fill"></i>
+                        <span>Heatmap</span>
+                    </div>
+                    <h3 class="video-card-title">High Engagement - Zone C</h3>
+                    <div class="video-card-meta">
+                        <div class="video-card-time">
+                            <i class="bi bi-clock"></i>
+                            <span>10:15 AM</span>
+                        </div>
+                        <div class="video-card-metric" style="color: var(--warning-amber);">8 min</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-card" data-model="interaction">
+                <div class="video-card-thumbnail" style="background: linear-gradient(135deg, #064E3B 0%, #10B981 100%);">
+                    <div class="play-icon-small">
+                        <i class="bi bi-play-fill"></i>
+                    </div>
+                    <div class="video-duration">2:00</div>
+                </div>
+                <div class="video-card-content">
+                    <div class="video-card-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--success-green);">
+                        <i class="bi bi-chat-dots-fill"></i>
+                        <span>Interactions</span>
+                    </div>
+                    <h3 class="video-card-title">Peak Service Period</h3>
+                    <div class="video-card-meta">
+                        <div class="video-card-time">
+                            <i class="bi bi-clock"></i>
+                            <span>3:15 PM</span>
+                        </div>
+                        <div class="video-card-metric" style="color: var(--success-green);">45</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-card" data-model="crowd">
+                <div class="video-card-thumbnail" style="background: linear-gradient(135deg, #991B1B 0%, #EF4444 100%);">
+                    <div class="play-icon-small">
+                        <i class="bi bi-play-fill"></i>
+                    </div>
+                    <div class="video-duration">2:00</div>
+                </div>
+                <div class="video-card-content">
+                    <div class="video-card-badge">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Crowd Density</span>
+                    </div>
+                    <h3 class="video-card-title">Morning Rush - Entry Point</h3>
+                    <div class="video-card-meta">
+                        <div class="video-card-time">
+                            <i class="bi bi-clock"></i>
+                            <span>10:30 AM</span>
+                        </div>
+                        <div class="video-card-metric">+95%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-card" data-model="visitor">
+                <div class="video-card-thumbnail" style="background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);">
+                    <div class="play-icon-small">
+                        <i class="bi bi-play-fill"></i>
+                    </div>
+                    <div class="video-duration">2:00</div>
+                </div>
+                <div class="video-card-content">
+                    <div class="video-card-badge" style="background: rgba(37, 99, 235, 0.2); color: var(--primary-blue);">
+                        <i class="bi bi-person-walking"></i>
+                        <span>Visitor Count</span>
+                    </div>
+                    <h3 class="video-card-title">Entry Congestion Peak</h3>
+                    <div class="video-card-meta">
+                        <div class="video-card-time">
+                            <i class="bi bi-clock"></i>
+                            <span>12:30 PM</span>
+                        </div>
+                        <div class="video-card-metric" style="color: var(--primary-blue);">234/hr</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="videoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #1E1E1E; border-radius: 20px; padding: 2rem; position: relative; max-width: 1200px;">
+            <button class="modal-close" onclick="closeModal()" style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem;">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <h2 class="modal-title">Yesterday's Highlights</h2>
+            <video controls autoplay style="width: 100%; border-radius: 10px;">
+                <source src="/assets/placeholder.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <!-- Share Menu -->
+    <div class="share-menu" id="shareMenu" style="position: fixed; right: -400px; top: 0; width: 350px; height: 100vh; background: #1E1E1E; z-index: 10001; transition: right 0.3s; padding: 2rem;">
+        <div class="modal-close" onclick="closeShare()" style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem;">
+            <i class="bi bi-x-lg"></i>
+        </div>
+        <h3>Share Video</h3>
+        <div class="share-options" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;">
+            <div class="share-option" onclick="shareVideo('facebook')" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px; cursor: pointer;">
+                <i class="bi bi-facebook" style="color: #1877F2; font-size: 1.5rem;"></i>
+                <span>Facebook</span>
+            </div>
+            <div class="share-option" onclick="shareVideo('twitter')" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px; cursor: pointer;">
+                <i class="bi bi-twitter-x" style="font-size: 1.5rem;"></i>
+                <span>Twitter</span>
+            </div>
+            <div class="share-option" onclick="shareVideo('whatsapp')" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px; cursor: pointer;">
+                <i class="bi bi-whatsapp" style="color: #25D366; font-size: 1.5rem;"></i>
+                <span>WhatsApp</span>
+            </div>
+            <div class="share-option" onclick="copyLink()" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px; cursor: pointer;">
+                <i class="bi bi-link-45deg" style="font-size: 1.5rem;"></i>
+                <span>Copy Link</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()" style="position: fixed; bottom: 2rem; right: 2rem; width: 50px; height: 50px; background: var(--primary-blue); border-radius: 50%; display: none; align-items: center; justify-content: center; color: white; font-size: 1.5rem; cursor: pointer; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s; border: none;">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- Core modules -->
+    <script src="js/toast.js"></script>
+    <script src="js/loading-state.js"></script>
+    <script src="/js/core.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/navigation.js"></script>
+    <script src="/js/heatmap.js"></script>
+    
+    <!-- Highlights module -->
+    <script src="/js/highlights.js"></script>
+    
+    <script>
+        // Initialize Swiper
+        const swiper = new Swiper('.heroSwiper', {
+            loop: true,
+            speed: 800,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            },
+            on: {
+                slideChange: function() {
+                    setTimeout(() => {
+                        const activeSlide = this.slides[this.activeIndex];
+                        const video = activeSlide.querySelector('.video-background');
+                        if (video) video.play().catch(e => {});
+                    }, 100);
+                }
+            }
+        });
+
+        // Auto-play first video on load
+        window.addEventListener('load', () => {
+            const video = document.querySelector('.swiper-slide-active .video-background');
+            if (video) video.play().catch(e => {});
+        });
+
+        // Page Initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🎯 Highlights page loading...');
+    
+    // ===== STEP 1: Check Authentication =====
+    const authData = await Auth.checkAuth();
+    if (!authData) {
+        return;
+    }
+    
+    console.log('✅ User authenticated:', authData.user.email);
+
+    // ===== STEP 2: Extract Devices from Stores =====
+    const stores = authData.stores || [];
+    
+    if (!stores || stores.length === 0) {
+        alert('No stores assigned to your account. Please contact support.');
+        Auth.logout();
+        return;
+    }
+    
+    const devices = [];
+    stores.forEach(store => {
+        if (store.devices && Array.isArray(store.devices)) {
+            store.devices.forEach(device => {
+                devices.push({
+                    device_id: device.device_id,
+                    store_id: store.id,
+                    store_name: store.store_name,
+                    last_heartbeat: device.last_heartbeat,
+                    status: device.connection_status || device.status || 'offline',
+                    ...device
+                });
+            });
+        }
+    });
+    
+    console.log(`📱 Found ${devices.length} device(s) across ${stores.length} store(s)`);
+    
+    if (devices.length === 0) {
+        alert('No devices found in your stores. Please contact support.');
+        Auth.logout();
+        return;
+    }
+
+    // ===== STEP 3: Device Selection Logic =====
+    let selectedDeviceId = localStorage.getItem('selectedDeviceId');
+    
+    // Verify device still exists
+    if (selectedDeviceId) {
+        const deviceExists = devices.find(d => d.device_id === selectedDeviceId);
+        if (!deviceExists) {
+            console.warn(`⚠️ Previously selected device ${selectedDeviceId} not found`);
+            selectedDeviceId = null;
+            localStorage.removeItem('selectedDeviceId');
+        }
+    }
+    
+    // Auto-select or show modal
+    if (!selectedDeviceId) {
+        if (devices.length === 1) {
+            selectedDeviceId = devices[0].device_id;
+            localStorage.setItem('selectedDeviceId', selectedDeviceId);
+            console.log('📱 Auto-selected single device:', selectedDeviceId);
+        } else {
+            console.log('📱 Multiple devices found. Showing selector...');
+            Auth.showDeviceSelector(devices);
+            return; // Wait for user to select device
+        }
+    }
+
+    // ===== STEP 4: Initialize CA.state with VALID device ID =====
+    window.CA = window.CA || {};
+    CA.state = {
+        deviceId: selectedDeviceId,  // ✅ Now guaranteed to be valid!
+        date: new Date().toISOString().split('T')[0],
+        camera: 'Global'
+    };
+    
+    console.log('✅ CA.state initialized:', CA.state);
+    
+    // ===== STEP 5: Update UI =====
+    // Update user info
+    const userNameDropdown = document.getElementById('userNameDropdown');
+    if (userNameDropdown) {
+        userNameDropdown.textContent = authData.user.full_name || authData.user.email;
+    }
+    
+    // Initialize store selector
+    initializeStoreSelector(devices);
+    
+    // ===== STEP 6: Load Highlights Data =====
+    if (typeof CA.highlights !== 'undefined') {
+        await CA.highlights.init();
+        await CA.highlights.load();
+    }
+    
+    // Initialize model tab filtering
+    initializeModelTabs();
+    
+    console.log('✅ Highlights page fully loaded');
+});
+
+        // Store Selector Functions
+        function initializeStoreSelector(devices) {
+            if (!devices || devices.length === 0) {
+                console.warn('⚠️ No devices available');
+                return;
+            }
+            
+            // Get current device ID
+            const currentDeviceId = localStorage.getItem('selectedDeviceId') || devices[0].device_id;
+            const currentDevice = devices.find(d => d.device_id === currentDeviceId);
+            
+            // Update current store name
+            const currentStoreName = document.getElementById('currentStoreName');
+            if (currentStoreName && currentDevice) {
+                currentStoreName.textContent = currentDevice.store_name || currentDevice.device_id;
+            }
+            
+            // Populate dropdown
+            const storeDropdown = document.getElementById('storeDropdown');
+            if (storeDropdown) {
+                storeDropdown.innerHTML = devices.map(device => `
+                    <div class="store-dropdown-item ${device.device_id === currentDeviceId ? 'active' : ''}" 
+                         onclick="switchStore('${device.device_id}')">
+                        <span class="store-name">${device.store_name || device.device_id}</span>
+                        <span class="store-device-id">${device.device_id}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleStoreDropdown() {
+            const dropdown = document.getElementById('storeDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+
+        function switchStore(deviceId) {
+            console.log('🔄 Switching to store:', deviceId);
+            localStorage.setItem('selectedDeviceId', deviceId);
+            if (CA.state) {
+                CA.state.deviceId = deviceId;
+            }
+            window.location.reload();
+        }
+
+        // Model Tab Filtering
+        function initializeModelTabs() {
+            const tabs = document.querySelectorAll('.model-tab');
+            const videoGrid = document.getElementById('videoGrid');
+            
+            if (!videoGrid) {
+                console.warn('⚠️ Video grid not found');
+                return;
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Get filter value
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Re-query cards on each click to include dynamically added cards
+                    const cards = videoGrid.querySelectorAll('.video-card');
+                    
+                    // Filter cards
+                    let visibleCount = 0;
+                    cards.forEach(card => {
+                        const model = card.getAttribute('data-model');
+                        if (filter === 'all') {
+                            // Show all cards when "All Videos" is selected
+                            card.style.display = 'block';
+                            visibleCount++;
+                        } else if (model === filter) {
+                            // Show only cards matching the filter
+                            card.style.display = 'block';
+                            visibleCount++;
+                        } else {
+                            // Hide cards that don't match
+                            card.style.display = 'none';
+                        }
+                    });
+                    
+                    console.log(`✅ Filter applied: ${filter}, showing ${visibleCount} of ${cards.length} cards`);
+                });
+            });
+            
+            // Trigger default filter (crowd density)
+            const defaultTab = document.querySelector('.model-tab.active');
+            if (defaultTab) {
+                defaultTab.click();
+            }
+        }
+
+        // Navigation Functions
+        function navigateToDashboard() {
+            window.location.href = '/index.html';
+        }
+
+        // Utility Functions
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('active');
+        }
+
+        function toggleShare() {
+            const shareMenu = document.getElementById('shareMenu');
+            shareMenu.style.right = shareMenu.style.right === '0px' ? '-400px' : '0px';
+        }
+
+        function closeShare() {
+            document.getElementById('shareMenu').style.right = '-400px';
+        }
+
+        function toggleBookmark() {
+            alert('Bookmarks feature coming soon!');
+        }
+
+        function showNotifications() {
+            alert('No new notifications');
+        }
+
+        function downloadVideo() {
+            alert('Download feature coming soon!');
+        }
+
+        function openAnalytics() {
+            window.location.href = '/index.html';
+        }
+
+        function shareVideo(platform) {
+            const url = window.location.href;
+            const platforms = {
+                'facebook': `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+                'twitter': `https://twitter.com/intent/tweet?url=${url}`,
+                'whatsapp': `https://wa.me/?text=${url}`
+            };
+            if (platforms[platform]) window.open(platforms[platform], '_blank');
+            closeShare();
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
+            closeShare();
+        }
+
+        function openModal() {
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('videoModal');
+            const video = modal.querySelector('video');
+            if (video) video.pause();
+            modal.style.display = 'none';
+        }
+
+        function toggleMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            mobileNav.style.display = mobileNav.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Scroll to Top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', function() {
+            const scrollButton = document.getElementById('scrollToTop');
+            if (window.pageYOffset > 300) {
+                scrollButton.style.display = 'flex';
+            } else {
+                scrollButton.style.display = 'none';
+            }
+        });
+
+        // Close dropdowns on click outside
+        document.addEventListener('click', function(event) {
+            // Close user dropdown
+            const userDropdown = document.getElementById('userDropdown');
+            const userMenuIcons = document.querySelectorAll('.user-menu .nav-icon');
+            let clickedUserMenu = false;
+            userMenuIcons.forEach(icon => {
+                if (icon.contains(event.target)) clickedUserMenu = true;
+            });
+            if (userDropdown && !clickedUserMenu && !userDropdown.contains(event.target)) {
+                userDropdown.classList.remove('active');
+            }
+            
+            // Close store dropdown
+            const storeDropdown = document.getElementById('storeDropdown');
+            const storeSelectorBtn = document.getElementById('storeSelectorBtn');
+            if (storeDropdown && storeSelectorBtn) {
+                if (!storeSelectorBtn.contains(event.target) && !storeDropdown.contains(event.target)) {
+                    storeDropdown.classList.remove('active');
+                }
+            }
+        });
+
+        // Close modals on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('userDropdown')?.classList.remove('active');
+                document.getElementById('storeDropdown')?.classList.remove('active');
+                closeModal();
+                closeShare();
+            }
+        });
+
+        // Click modal overlay to close
+        document.getElementById('videoModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

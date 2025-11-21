@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Third Umpire Analytics</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+     <!-- Core CSS - Load First -->
+    <link rel="stylesheet" href="/css/core.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/toast-loading.css">
+    <link rel="stylesheet" href="/css/navigation.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Settings Page Specific Styles */
+        .settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .settings-header {
+            margin-bottom: 2rem;
+        }
+
+        .settings-header h1 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .settings-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .settings-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .settings-card h3 {
+            color: var(--accent-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group-custom {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group-custom label {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-group-custom input,
+        .form-group-custom select,
+        .form-group-custom textarea {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 0.75rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .form-group-custom input:focus,
+        .form-group-custom select:focus,
+        .form-group-custom textarea:focus {
+            background: var(--bg-primary);
+            border-color: var(--accent-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group-custom input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-settings-primary {
+            background: linear-gradient(135deg, var(--accent-primary), #0284c7);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-settings-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-settings-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-settings-secondary:hover {
+            background: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            color: var(--accent-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-card .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .device-card,
+        .store-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .device-card:hover,
+        .store-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .device-card h5,
+        .store-card h5 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .device-info,
+        .store-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .info-item i {
+            color: var(--accent-primary);
+            width: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10B981;
+        }
+
+        .status-offline {
+            background: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+        }
+
+        .status-delayed {
+            background: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
+        }
+
+        .danger-zone {
+            background: rgba(239, 68, 68, 0.05);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .danger-zone h4 {
+            color: #EF4444;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .danger-zone p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--text-disabled);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h5 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .device-actions,
+        .store-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm-custom {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        .alert-custom {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-custom i {
+            color: var(--accent-primary);
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar (reuse from highlights.html) -->
+    <div class="top-nav">
+        <div class="nav-content">
+            <div class="logo">
+                <i class="bi bi-camera-video-fill" style="color: #F97316;"></i>
+                <span>ThirdUmpire</span>
+            </div>
+
+            <div class="nav-menu">
+                <a href="/highlights.html" class="nav-item">
+                    <i class="bi bi-stars"></i>
+                    <span>Highlights</span>
+                </a>
+                <a href="/index.html" class="nav-item">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/settings.html" class="nav-item active">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+
+            <!-- Store Selector -->
+            <div class="store-selector">
+                <div class="store-selector-btn" id="storeSelectorBtn" onclick="toggleStoreDropdown()">
+                    <i class="bi bi-shop"></i>
+                    <span id="currentStoreName">Loading...</span>
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+                <div class="store-dropdown" id="storeDropdown">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- User Menu -->
+            <div class="user-menu">
+                <div class="user-menu-btn" onclick="toggleUserMenu()">
+                    <i class="bi bi-person-circle"></i>
+                    <span id="userNameDropdown">User</span>
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/settings.html" class="user-dropdown-item">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
+                    </a>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="#" onclick="Auth.logout()" class="user-dropdown-item">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Container -->
+    <div class="settings-container">
+        <!-- Header -->
+        <div class="settings-header">
+            <h1>
+                <i class="bi bi-gear-fill" style="color: var(--accent-primary);"></i>
+                Settings
+            </h1>
+            <p>Manage your profile, stores, devices, and account preferences</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab-profile"
+                    type="button" role="tab">
+                    <i class="bi bi-person-fill me-2"></i>Profile
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="stores-tab" data-bs-toggle="tab" data-bs-target="#tab-stores" type="button"
+                    role="tab">
+                    <i class="bi bi-shop me-2"></i>Stores
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="devices-tab" data-bs-toggle="tab" data-bs-target="#tab-devices"
+                    type="button" role="tab">
+                    <i class="bi bi-cpu me-2"></i>Devices
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#tab-system" type="button"
+                    role="tab">
+                    <i class="bi bi-info-circle me-2"></i>System
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="settingsTabContent">
+
+            <!-- PROFILE TAB -->
+            <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
+                <!-- Alert Container -->
+                <div id="profileAlertContainer"></div>
+
+                <!-- Profile Information Card -->
+                <div class="settings-card">
+                    <h3>
+                        <i class="bi bi-person-badge"></i>
+                        Profile Information
+                    </h3>
+
+                    <form id="profileForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="fullName">Full Name</label>
+                                    <input type="text" id="fullName" placeholder="Enter your full name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" placeholder="your@email.com" disabled>
+                                    <small class="text-muted">Email cannot be changed</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" placeholder="+91 12345 67890">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-settings-primary">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Save Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Change Password Card -->
+                <div class="settings-card">
+                    <h3>
+                        <i class="bi bi-shield-lock"></i>
+                        Change Password
+                    </h3>
+
+                    <form id="passwordForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="oldPassword">Current Password</label>
+                                    <input type="password" id="oldPassword" placeholder="Enter current password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="newPassword">New Password</label>
+                                    <input type="password" id="newPassword" placeholder="Enter new password">
+                                    <small class="text-muted">Minimum 6 characters</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-custom">
+                                    <label for="confirmPassword">Confirm New Password</label>
+                                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-settings-primary">
+                            <i class="bi bi-key me-2"></i>
+                            Change Password
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Account Statistics Card -->
+                <div class="settings-card">
+                    <h3>
+                        <i class="bi bi-bar-chart"></i>
+                        Account Statistics
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <span class="stat-value" id="statMemberSince">-</span>
+                                <span class="stat-label">Member Since</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <span class="stat-value" id="statTotalStores">0</span>
+                                <span class="stat-label">Total Stores</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <span class="stat-value" id="statTotalDevices">0</span>
+                                <span class="stat-label">Total Devices</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <span class="stat-value" id="statTotalCameras">0</span>
+                                <span class="stat-label">Total Cameras</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- STORES TAB -->
+            <!-- ============================================================ -->
+            <div class="tab-pane fade" id="tab-stores" role="tabpanel">
+                <!-- Alert Container -->
+                <div id="storesAlertContainer"></div>
+
+                <!-- Stores Header with Add Button -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="mb-1">
+                            <i class="bi bi-shop" style="color: var(--accent-primary);"></i>
+                            Your Stores
+                        </h3>
+                        <p class="text-muted mb-0">Manage your physical store locations</p>
+                    </div>
+                    <button class="btn-settings-primary" onclick="Settings.showAddStoreModal()">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Add Store
+                    </button>
+                </div>
+
+                <!-- Stores List -->
+                <div id="storesList" class="row">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="storesEmptyState" class="empty-state" style="display: none;">
+                    <i class="bi bi-shop"></i>
+                    <h5>No Stores Yet</h5>
+                    <p>Create your first store location to get started</p>
+                    <button class="btn-settings-primary" onclick="Settings.showAddStoreModal()">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Add Your First Store
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- DEVICES TAB -->
+            <!-- ============================================================ -->
+            <div class="tab-pane fade" id="tab-devices" role="tabpanel">
+                <!-- Alert Container -->
+                <div id="devicesAlertContainer"></div>
+
+                <!-- Devices Header with Add Button -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="mb-1">
+                            <i class="bi bi-cpu" style="color: var(--accent-primary);"></i>
+                            Your Devices
+                        </h3>
+                        <p class="text-muted mb-0">Manage your Jetson hardware devices</p>
+                    </div>
+                    <button class="btn-settings-primary" onclick="Settings.showAddDeviceModal()">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Add Device
+                    </button>
+                </div>
+
+                <!-- Devices List -->
+                <div id="devicesList" class="row">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="devicesEmptyState" class="empty-state" style="display: none;">
+                    <i class="bi bi-cpu"></i>
+                    <h5>No Devices Yet</h5>
+                    <p>Register your first Jetson device to start collecting analytics</p>
+                    <button class="btn-settings-primary" onclick="Settings.showAddDeviceModal()">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Add Your First Device
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- SYSTEM TAB -->
+            <!-- ============================================================ -->
+            <div class="tab-pane fade" id="tab-system" role="tabpanel">
+                <!-- Alert Container -->
+                <div id="systemAlertContainer"></div>
+
+                <!-- Account Information Card -->
+                <div class="settings-card">
+                    <h3>
+                        <i class="bi bi-info-circle"></i>
+                        Account Information
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <i class="bi bi-hash"></i>
+                                <div>
+                                    <small class="text-muted d-block">User ID</small>
+                                    <strong id="systemUserId">-</strong>
+                                </div>
+                            </div>
+
+                            <div class="info-item mb-3">
+                                <i class="bi bi-envelope"></i>
+                                <div>
+                                    <small class="text-muted d-block">Email Address</small>
+                                    <strong id="systemEmail">-</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <i class="bi bi-calendar"></i>
+                                <div>
+                                    <small class="text-muted d-block">Member Since</small>
+                                    <strong id="systemMemberSince">-</strong>
+                                </div>
+                            </div>
+
+                            <div class="info-item mb-3">
+                                <i class="bi bi-shield-check"></i>
+                                <div>
+                                    <small class="text-muted d-block">Account Status</small>
+                                    <strong class="text-success">Active</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="danger-zone">
+                    <h4>
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Danger Zone
+                    </h4>
+                    <p>
+                        <strong>Delete Account:</strong> This action is permanent and cannot be undone.
+                        All your stores, devices, and analytics data will be removed.
+                    </p>
+                    <button class="btn-danger-custom" onclick="Settings.showDeleteAccountModal()">
+                        <i class="bi bi-trash me-2"></i>
+                        Delete My Account
+                    </button>
+                </div>
+            </div>
+            <!-- ============================================================ -->
+            <!-- ADD STORE MODAL -->
+            <!-- ============================================================ -->
+            <div class="modal fade" id="addStoreModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content"
+                        style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                            <h5 class="modal-title" style="color: var(--text-primary);">
+                                <i class="bi bi-shop me-2"></i>
+                                Add New Store
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addStoreForm">
+                                <div class="form-group-custom">
+                                    <label for="addStoreName">Store Name <span class="text-danger">*</span></label>
+                                    <input type="text" id="addStoreName" class="form-control"
+                                        placeholder="Downtown Mall" required>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="addStoreAddress">Address</label>
+                                    <input type="text" id="addStoreAddress" class="form-control"
+                                        placeholder="123 Main Street">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="addStoreCity">City</label>
+                                            <input type="text" id="addStoreCity" class="form-control"
+                                                placeholder="Hyderabad">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="addStoreState">State</label>
+                                            <input type="text" id="addStoreState" class="form-control"
+                                                placeholder="Telangana">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="addStoreTimezone">Timezone</label>
+                                    <select id="addStoreTimezone" class="form-control">
+                                        <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                        <option value="America/New_York">America/New_York (EST)</option>
+                                        <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                                        <option value="Europe/London">Europe/London (GMT)</option>
+                                        <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                                        <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                            <button type="button" class="btn-settings-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-settings-primary" onclick="Settings.createStore()">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Add Store
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- EDIT STORE MODAL -->
+            <!-- ============================================================ -->
+            <div class="modal fade" id="editStoreModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content"
+                        style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                            <h5 class="modal-title" style="color: var(--text-primary);">
+                                <i class="bi bi-pencil me-2"></i>
+                                Edit Store
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editStoreForm">
+                                <input type="hidden" id="editStoreId">
+
+                                <div class="form-group-custom">
+                                    <label for="editStoreName">Store Name <span class="text-danger">*</span></label>
+                                    <input type="text" id="editStoreName" class="form-control" required>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="editStoreAddress">Address</label>
+                                    <input type="text" id="editStoreAddress" class="form-control">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="editStoreCity">City</label>
+                                            <input type="text" id="editStoreCity" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="editStoreState">State</label>
+                                            <input type="text" id="editStoreState" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="editStoreTimezone">Timezone</label>
+                                    <select id="editStoreTimezone" class="form-control">
+                                        <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                        <option value="America/New_York">America/New_York (EST)</option>
+                                        <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                                        <option value="Europe/London">Europe/London (GMT)</option>
+                                        <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                                        <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                            <button type="button" class="btn-settings-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-settings-primary" onclick="Settings.updateStore()">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- ADD DEVICE MODAL -->
+            <!-- ============================================================ -->
+            <div class="modal fade" id="addDeviceModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content"
+                        style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                            <h5 class="modal-title" style="color: var(--text-primary);">
+                                <i class="bi bi-cpu me-2"></i>
+                                Add New Device
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert-custom mb-3">
+                                <i class="bi bi-info-circle"></i>
+                                <small>Register a new Jetson device to start collecting crowd analytics</small>
+                            </div>
+
+                            <form id="addDeviceForm">
+                                <div class="form-group-custom">
+                                    <label for="addDeviceId">Device ID <span class="text-danger">*</span></label>
+                                    <input type="text" id="addDeviceId" class="form-control"
+                                        placeholder="raspberrypi_001" required>
+                                    <small class="text-muted">Must be unique across all devices</small>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="addDeviceStore">Assign to Store <span
+                                            class="text-danger">*</span></label>
+                                    <select id="addDeviceStore" class="form-control" required>
+                                        <option value="">Select a store...</option>
+                                        <!-- Will be populated by JavaScript -->
+                                    </select>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="addDeviceHardware">Hardware Type</label>
+                                    <select id="addDeviceHardware" class="form-control">
+                                        <option value="jetson_orin_nano">Jetson Orin Nano</option>
+                                        <option value="jetson_xavier_nx">Jetson Xavier NX</option>
+                                        <option value="jetson_agx_orin">Jetson AGX Orin</option>
+                                        <option value="raspberry_pi">Raspberry Pi</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                            <button type="button" class="btn-settings-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-settings-primary" onclick="Settings.addDevice()">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Add Device
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- MOVE DEVICE MODAL -->
+            <!-- ============================================================ -->
+            <div class="modal fade" id="moveDeviceModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content"
+                        style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                            <h5 class="modal-title" style="color: var(--text-primary);">
+                                <i class="bi bi-arrow-left-right me-2"></i>
+                                Move Device
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="moveDeviceId">
+
+                            <div class="alert-custom mb-3">
+                                <i class="bi bi-info-circle"></i>
+                                <small>Moving device: <strong id="moveDeviceName"></strong></small>
+                            </div>
+
+                            <form id="moveDeviceForm">
+                                <div class="form-group-custom">
+                                    <label for="moveDeviceCurrentStore">Current Store</label>
+                                    <input type="text" id="moveDeviceCurrentStore" class="form-control" disabled>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="moveDeviceNewStore">Move to Store <span
+                                            class="text-danger">*</span></label>
+                                    <select id="moveDeviceNewStore" class="form-control" required>
+                                        <option value="">Select destination store...</option>
+                                        <!-- Will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                            <button type="button" class="btn-settings-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-settings-primary" onclick="Settings.moveDevice()">
+                                <i class="bi bi-arrow-right me-2"></i>
+                                Move Device
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- DELETE CONFIRMATION MODAL (REUSABLE) -->
+            <!-- ============================================================ -->
+            <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content"
+                        style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                            <h5 class="modal-title" style="color: #EF4444;">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Confirm Deletion
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="deleteType">
+                            <input type="hidden" id="deleteId">
+
+                            <p style="color: var(--text-primary);">
+                                Are you sure you want to delete <strong id="deleteName"></strong>?
+                            </p>
+
+                            <div class="alert-custom" style="border-left-color: #EF4444;">
+                                <i class="bi bi-exclamation-triangle" style="color: #EF4444;"></i>
+                                <small><strong>Warning:</strong> This action cannot be undone. Make sure there are no
+                                    devices or data dependencies.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                            <button type="button" class="btn-settings-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-danger-custom" onclick="Settings.confirmDelete()">
+                                <i class="bi bi-trash me-2"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- DELETE ACCOUNT MODAL -->
+            <!-- ============================================================ -->
+            <div class="modal fade" id="deleteAccountModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content"
+                        style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                            <h5 class="modal-title" style="color: #EF4444;">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Delete Account
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="color: var(--text-primary);">
+                                <strong>This action is permanent and cannot be undone.</strong>
+                            </p>
+
+                            <p style="color: var(--text-secondary);">
+                                All your data will be permanently deleted:
+                            </p>
+
+                            <ul style="color: var(--text-secondary);">
+                                <li>Your profile and account settings</li>
+                                <li>All stores and devices</li>
+                                <li>All analytics data and heatmaps</li>
+                                <li>All historical records</li>
+                            </ul>
+
+                            <form id="deleteAccountForm">
+                                <div class="form-group-custom">
+                                    <label for="deleteAccountPassword">
+                                        Enter your password to confirm <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" id="deleteAccountPassword" class="form-control"
+                                        placeholder="Enter your password" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+                            <button type="button" class="btn-settings-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn-danger-custom" onclick="Settings.deleteAccount()">
+                                <i class="bi bi-trash me-2"></i>
+                                Delete My Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core JavaScript -->
+    <script src="js/toast.js"></script>
+    <script src="js/loading-state.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/settings.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
